@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AetherGuild | Paranormal GIS</title>
+
+    
+
+    <!-- Leaflet CSS -->
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    
+
+    <style>
+
+        body { margin: 0; padding: 0; background: #121212; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        #map { height: 100vh; width: 100vw; }
+
+        
+
+        .ui-panel { 
+
+            position: absolute; top: 20px; left: 60px; z-index: 1000; 
+
+            background: rgba(20, 20, 20, 0.9); color: #00ffcc; 
+
+            padding: 15px; border: 1px solid #00ffcc; border-radius: 4px;
+
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+
+            pointer-events: none;
+
+        }
+
+        
+
+        .ui-panel h2 { margin: 0 0 5px 0; font-size: 18px; text-transform: uppercase; letter-spacing: 2px; }
+
+        .ui-panel p { margin: 0; font-size: 12px; color: #888; }
+
+    </style>
+
+</head>
+
+<body>
+
+
+    <div class="ui-panel">
+
+        <h2>AetherGuild Terminal</h2>
+
+        <p>Host: aeg-servitor0</p>
+
+        <p>Status: Monitoring PostGIS Database...</p>
+
+    </div>
+
+
+    <div id="map"></div>
+
+
+    <!-- Leaflet JS -->
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+
+    <script>
+
+        // 1. Initialize map centered on the Twin Cities area
+
+        var map = L.map('map').setView([44.9778, -93.2650], 11);
+
+
+        // 2. Add a Dark/Mysterious Base Layer (CartoDB Dark Matter)
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+
+            attribution: '&copy; OpenStreetMap &copy; CARTO'
+
+        }).addTo(map);
+
+
+        // 3. The "Bridge": Fetch data from your PostGIS via data.php
+
+        fetch('data.php')
+
+            .then(response => {
+
+                if (!response.ok) throw new Error("Data bridge offline");
+
+                return response.json();
+
+            })
+
+            .then(geojsonData => {
+
+                L.geoJSON(geojsonData, {
+
+                    onEachFeature: function (feature, layer) {
+
+                        // Create a popup using the 'name' and 'info' columns from your sightings table
+
+                        let popupContent = `
+
+                            <div style="color: #333;">
+
+                                <strong>Sighting:</strong> ${feature.properties.name}<br>
+
+                                <strong>Intel:</strong> ${feature.properties.info}
+
+                            </div>`;
+
+                        layer.bindPopup(popupContent);
+
+                    }
+
+                }).addTo(map);
+
+            })
+
+            .catch(err => {
+
+                console.error("Logic Error:", err);
+
+                // Fallback marker if database bridge fails
+
+                L.marker([44.9778, -93.2650]).addTo(map)
+
+                    .bindPopup("Database bridge pending. Check data.php configuration.");
+
+            });
+
+    </script>
+
+</body>
+
+</html>
