@@ -137,6 +137,27 @@
                     .bindPopup("Database bridge pending. Check data.php configuration.");
 
             });
+        // --- THE EASY BUTTONS ---
+// When you click the map, it will place a marker and show you the coordinates
+
+map.on('click', function(e) {
+    var lat = e.latlng.lat.toFixed(6); // Gets Latitude to 6 decimal places
+    var lng = e.latlng.lng.toFixed(6); // Gets Longitude to 6 decimal places
+
+    // 1. Create a marker at the clicked spot
+    L.marker([lat, lng]).addTo(map)
+        .bindPopup(`
+            <div style="color: #333;">
+                <b>Coordinate Captured!</b><br>
+                Lat: <code>${lat}</code><br>
+                Lon: <code>${lng}</code><br>
+                <button onclick="navigator.clipboard.writeText('${lat}, ${lng}');">Copy to Clipboard</button>
+            </div>`)
+        .openPopup();
+
+    // 2. Log it to the browser console for testing
+    console.log("AetherGuild Captured: " + lat + ", " + lng);
+});
 
     </script>
 
