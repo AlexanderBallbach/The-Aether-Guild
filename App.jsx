@@ -1,4 +1,3 @@
-pct exec 104 -- bash -c "cat > /opt/ather-register/src/App.jsx << 'EOF'
 import { useState, useEffect, useRef } from 'react';
 
 const SUPABASE_URL = 'http://192.168.1.103:8000';
